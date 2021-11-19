@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>pilApp</title>
+    <script src="./bundle.js"></script>
+  </head>
+  <body>
+    <canvas id="approot" width="1600" height="1200"></canvas>
+    <script>
+      window.onload = () => {
+        const canvas = document.querySelector("#approot");
+        window.pilcrow.default.eventBus.addEventListener("mousedown", () => {
+          console.log("Mousedown")
+        })
+        window.pilcrow.default.mount(canvas).then(() => {
+          window.pilcrow.default.paint();
+        })
+      }
+    </script>
+  </body>
+</html>
