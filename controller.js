@@ -7,7 +7,7 @@ const webpackConfig = require("./webpack.config.js");
 
 
 function handlePillAppRequest(req, res) {
-  generateProject(req.body).then(() => {
+  generateProject(req.body).then(uuid => {
     res.json({
       generated_project: uuid
     });
@@ -65,7 +65,7 @@ function startbuild(uuid) {
           console.error(stats);
         } else {
           fs.unlinkSync(`./outputs/${uuid}/pilApp.js`);
-
+          fs.unlinkSync(`./outputs/${uuid}/pil.js`);
           // Zip folder 
           zipProject(uuid);
         }        

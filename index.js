@@ -26,7 +26,17 @@ app.post('/images', upload.single('image'), (req, res) => {
 
 app.use('/image', express.static('./staticAssets'));
 
-// app.get('/:{uuid}', downloadZipFile);
+app.get('/project/:uuid', (req, res) => {
+  const projectId = req.params.uuid;
+  console.log("Downloading: ", projectId);
+  if (fs.existsSync(`./outputs/${projectId}.zip`)) {
+    res.download(`./outputs/${projectId}.zip`);
+  } else {
+    res.status(404);
+    res.json({ "message": "No project found for " + projectId + ".zip" });
+  }
+  
+});
 
 app.listen(port, () => {
   console.log(`App listening at: http://localhost:${port}`)
