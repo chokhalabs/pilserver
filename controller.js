@@ -51,6 +51,7 @@ function startbuild(uuid) {
       });
 
       // Copy webpack config
+      fs.copyFileSync('./pillBase.js', `./outputs/${uuid}/pillBase.js`);
       fs.copyFileSync('./pilApp.js', `./outputs/${uuid}/pilApp.js`);
       fs.copyFileSync('./index.html', `./outputs/${uuid}/index.html`);
 
@@ -66,6 +67,7 @@ function startbuild(uuid) {
         } else {
           fs.unlinkSync(`./outputs/${uuid}/pilApp.js`);
           fs.unlinkSync(`./outputs/${uuid}/pil.js`);
+          fs.unlinkSync(`./outputs/${uuid}/pillBase.js`);
           // Zip folder 
           zipProject(uuid);
         }        
