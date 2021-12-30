@@ -97,4 +97,7 @@ function zipProject(uuid) {
   archive.finalize();
 }
 
-module.exports = handlePillAppRequest;
+module.exports = {
+  zipProject,
+  handlePillAppRequest
+};

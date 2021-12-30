@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const fs = require("fs");
-const pillAppHandler = require("./controller");
+const { handlePillAppRequest: pillAppHandler } = require("./controller");
+const rollupBuilder = require("./rollupcontroller");
 
 const upload = multer({
   dest: 'staticAssets'
@@ -16,6 +17,7 @@ app.use(cors());
 const port = 3030;
 
 app.post('/', pillAppHandler);
+app.post('/buildproject', rollupBuilder);
 
 app.post('/images', upload.single('image'), (req, res) => {
   const file = req.file;
