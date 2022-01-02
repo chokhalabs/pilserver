@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Stage, Layer } from 'react-konva';
 
 import appconfig from "./appconfig.js";
+import expectedHandlers from "./toBeSuppliedByDevs.js";
 
 function evaluateProps($props, propsExprs) {
   const evaluated = {...propsExprs};
@@ -34,7 +35,10 @@ function transformToVDOM(config, $props) {
 }
 
 function App() {
-  const konvaApp = h(transformToVDOM(appconfig))
+  const expectedProps = {
+    ...expectedHandlers
+  };
+  const konvaApp = h(transformToVDOM(appconfig, expectedProps))
   return h(
     Stage,
     {
