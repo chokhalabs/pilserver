@@ -14,10 +14,17 @@ function handleRequests(req, res) {
 function createStubsForOnClick(config) {
   const alerter = (msg) => `() => alert("${msg}")`
   let stubs = [];
-  if (config.props.onClick && config.props.onClick.expr) {
-    const expr = config.props.onClick.expr;
-    stubs.push(`${expr.substring("$props.".length)}: ${alerter("onClick of config.id, config.type")}`)
-  }
+  Object.keys(config.props).forEach(key => {
+    if (config.props[key].expr) {
+      const expr = config.props[key].expr;
+      const handler = expr.substring("$props.".length); 
+      if (/^\$props.on(a-zA-Z)$/.test(expr)) {
+        stubs.push(`${handler}: ${alerter("handler of " + config.id + "," + config.type)}`)
+      } else {
+        stubs.push(`${handler}: "default ${handler}"`)
+      }
+    }
+  })
   if (config.children.length > 0) {
     let childstubs = config.children.map(child => createStubsForOnClick(child, stubs)).flat(Infinity);
     stubs = stubs.concat(childstubs);
