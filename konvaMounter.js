@@ -1,4 +1,4 @@
-import React, { createElement as h } from 'react';
+import React, { createElement as h, useState} from 'react';
 import ReactDOM from 'react-dom';
 import { Stage, Layer } from 'react-konva';
 
@@ -38,7 +38,23 @@ function App() {
   const expectedProps = {
     ...expectedHandlers
   };
-  const konvaApp = h(transformToVDOM(appconfig, expectedProps))
+  // Separate eventhandlers from binded values
+  const bindedValues = {}, eventHandlers = {};
+  Object.keys(expectedHandlers).forEach(key => {
+    if (/^on[A-Z](.*)$/.test(key)) {
+      eventHandlers[key] = expectedHandlers[key];
+    } else {
+      bindedValues[key] = expectedHandlers[key];
+    }
+  })
+  // Put binded values in a state
+  const [globalState, setGlobalState] = useState(bindedValues);
+  // Pass setState to eventHandlers
+  for (let key in eventHandlers) {
+    eventHandlers[key] = (ev) => expectedHandlers[key](ev, globalState, setGlobalState)
+  }
+  // Then continue with generation of the dom
+  const konvaApp = h(transformToVDOM(appconfig, { ...globalState, ...eventHandlers }))
   return h(
     Stage,
     {

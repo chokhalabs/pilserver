@@ -46,9 +46,7 @@ function generateProject(uuid, config, stubs) {
     `
   );
   fs.writeFileSync(`./outputs/${uuid}/src/toBeSuppliedByDevs.js`, 
-    `
-    export default ${stubs}
-    `
+    `export default ${stubs}`
   );
   zipProject(uuid);
 }
