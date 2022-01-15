@@ -18,10 +18,12 @@ function createStubsForOnClick(config) {
     if (config.props[key].expr) {
       const expr = config.props[key].expr;
       const handler = expr.substring("$props.".length); 
-      if (/^\$props.on(a-zA-Z)$/.test(expr)) {
+      if (/^\$props.on[a-zA-Z]+$/.test(expr)) {
         stubs.push(`${handler}: ${alerter("handler of " + config.id + "," + config.type)}`)
+      } else if (!config.props[key].map) {
+        stubs.push(`${handler}: "${config.props[key].default}"`)
       } else {
-        stubs.push(`${handler}: "default ${handler}"`)
+        stubs.push(`${handler}: ${JSON.stringify(config.props[key].default)}`)
       }
     }
   })
