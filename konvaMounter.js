@@ -10,7 +10,12 @@ function evaluateProps($props, propsExprs) {
   Object.keys(propsExprs).forEach(key => {
     const propval = propsExprs[key];
     if (typeof propval === "object") {
-      evaluated[key] = eval(propval.expr);
+      if ($props[propval.expr.substring("$props.".length)]) {
+        // evaluated[key] = eval(propval.expr);
+        evaluated[key] = $props[propval.expr.substring("$props.".length)];
+      } else {
+        evaluated[key] = propval.default;
+      }
     }
   });
   return evaluated;
@@ -18,26 +23,52 @@ function evaluateProps($props, propsExprs) {
 
 function transformToVDOM(config, $props) {
   let props = null;
+  let mappedProps = [];
   if (config.props) {
     props = evaluateProps($props, config.props);
+    // If config has more than one mapped props then choose only one to map over and print an error 
+    // telling that only one mapped prop is allowed per component
+    mappedProps = Object.keys(props).filter(key => {
+      const prop = (props || {})[key];
+      return (typeof prop === "object") && prop.map;
+    });
+    if (mappedProps.length > 1) {
+      console.error("There are multiple mapped props in the ccomponent which is not allowed!", config, $props, mappedProps);
+    }
   }
-  const children = config.children.map(child => h(transformToVDOM(child, $props), { key: child.id }));
   return function() {
-    return h(
-      config.type,
-      { 
-        ...props,
-        id: config.id
-      },
-      children
-    );
+    // If there is a mapped prop then return a group with one component per item in the mapped prop
+    if (mappedProps.length === 0) {
+      const children = config.children.map(child => h(transformToVDOM(child, $props), { key: child.id }));
+      return h(
+        config.type,
+        { 
+          ...props,
+          id: config.id
+        },
+        children
+      );
+    } else {
+      const mappedPropKey = mappedProps[0];
+      const mappedProp = (props && props[mappedPropKey] || []);
+      if (mappedProp.length === 0) {
+        console.error("Did not get array in mappedProp!", mappedProp, mappedPropKey);
+      }
+      const children = config.children.map(child => h(transformToVDOM(child, $props), { key: child.id }));
+      return mappedProp.map((item, i) => h(
+        config.type,
+        {
+          ...props,
+          [mappedPropKey]: item,
+          id: config.id + i
+        },
+        children
+      )) 
+    }
   }
 }
 
 function App() {
-  const expectedProps = {
-    ...expectedHandlers
-  };
   // Separate eventhandlers from binded values
   const bindedValues = {}, eventHandlers = {};
   Object.keys(expectedHandlers).forEach(key => {
